@@ -1,0 +1,4 @@
+info: 2023-09-13T11:46:52.981Z: 	USER_TO_LIQUIDATE: 2 
+info: 2023-09-13T11:46:59.516Z: 	Pair is not available - C:\Users\mubas\Desktop\chainscore\backend\reax\services\liquidation\liq-lending\src\controller\helper\get-route.ts 
+info: 2023-09-13T11:46:59.516Z: 	route not found 
+info: 2023-09-13T11:47:00.030Z: 	FINISH_LIQUIDATING ... 

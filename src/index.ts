@@ -3,9 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import { SENTRY_DSN } from './utils/secrets';
+import log from './config/logger';
 
 const app = express();
 
@@ -27,13 +29,22 @@ app.use(Sentry.Handlers.tracingHandler());
 
 app.use(compression());
 
-app.use(morgan('dev'));
+app.use(morgan('tiny'));
 
 app.use(cors({
   origin: '*'
 }));
 app.use(helmet());
 app.use(express.json());
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+app.use(limiter);
+app.set('trust proxy', 1);
 
 
 // mention endpoint or functions below
@@ -49,5 +60,11 @@ app.use(function onError (err: any, req: any, res: any, next: any) {
   // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
   res.end(res.sentry + '\n');
 });
+
+process.on('uncaughtException',(error)=>{
+  log.error(`UNCAUGHT_EXCEPTION: ${error}`);
+  Sentry.captureException(error);
+  process.exit(1);
+})
 
 export default app;
